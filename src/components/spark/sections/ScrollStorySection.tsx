@@ -266,6 +266,34 @@ export function ScrollStorySection() {
       className="relative"
       style={{ height: "800vh" }}
     >
+      <style>{`
+        @keyframes core-breathe {
+          0%, 100% { transform: scale(0.95); opacity: 0.95; filter: drop-shadow(0 0 15px rgba(212,175,55,0.25)); }
+          50% { transform: scale(1.05); opacity: 1; filter: drop-shadow(0 0 35px rgba(212,175,55,0.55)); }
+        }
+        @keyframes spark-core-pulse-1 {
+          0% { transform: scale(0.85); opacity: 0.8; }
+          100% { transform: scale(1.4); opacity: 0; }
+        }
+        @keyframes spark-core-pulse-2 {
+          0% { transform: scale(0.85); opacity: 0.5; }
+          100% { transform: scale(1.75); opacity: 0; }
+        }
+        @keyframes logo-slow-rotate {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        ${Array.from({ length: 18 }).map((_, i) => {
+          const radius = 35 + (i % 3) * 15;
+          const direction = i % 2 === 0 ? 1 : -1;
+          return `
+            @keyframes spark-particle-orbit-${i} {
+              0% { transform: rotate(0deg) translate(${radius}px) rotate(0deg); }
+              100% { transform: rotate(${360 * direction}deg) translate(${radius}px) rotate(${-360 * direction}deg); }
+            }
+          `;
+        }).join("\n")}
+      `}</style>
       {/* Pinned stage */}
       <div
         ref={pinRef}
@@ -389,67 +417,55 @@ export function ScrollStorySection() {
               <div className="absolute -inset-8 rounded-full bg-spark-primary/25 blur-2xl" />
               <div className="absolute -inset-4 rounded-full bg-spark-accent/15 blur-xl" />
 
-              {/* core sphere with inner dashboard preview */}
-              <div className="relative grid h-52 w-52 place-items-center overflow-hidden rounded-full bg-gradient-to-br from-spark-primary via-spark-primary-soft to-spark-accent shadow-spark sm:h-64 sm:w-64">
+              {/* core sphere with Spark Technology Logo (Option 1) */}
+              <div className="relative grid h-52 w-52 place-items-center overflow-hidden rounded-full bg-gradient-to-br from-spark-primary via-spark-primary-soft to-spark-accent shadow-spark sm:h-64 sm:w-64 animate-[core-breathe_4s_ease-in-out_infinite]">
                 {/* dark inner backdrop */}
-                <div className="absolute inset-3 rounded-full bg-spark-ink/55 backdrop-blur-md" />
+                <div className="absolute inset-3 rounded-full bg-spark-ink/75 backdrop-blur-md" />
 
                 {/* highlight */}
-                <div className="absolute left-8 top-8 h-16 w-16 rounded-full bg-white/40 blur-xl" />
+                <div className="absolute left-8 top-8 h-16 w-16 rounded-full bg-white/20 blur-xl" />
 
-                {/* INNER DASHBOARD PREVIEW — makes the orb feel "alive" */}
-                <div className="relative z-10 flex h-40 w-40 flex-col gap-1.5 rounded-xl bg-spark-ink/70 p-2 backdrop-blur-sm sm:h-52 sm:w-52">
-                  {/* top bar */}
-                  <div className="flex items-center justify-between text-[7px] text-spark-secondary/80">
-                    <span className="flex items-center gap-1">
-                      <span className="h-1.5 w-1.5 rounded-full bg-green-400" />
-                      LIVE
-                    </span>
-                    <span className="font-serif text-spark-accent">Spark</span>
-                  </div>
-                  {/* KPI row */}
-                  <div className="grid grid-cols-2 gap-1">
-                    <div className="rounded-md bg-spark-accent/15 px-1.5 py-1">
-                      <div className="text-[6px] uppercase text-spark-secondary/60">Revenue</div>
-                      <div className="font-serif text-[11px] text-spark-accent">$284K</div>
-                    </div>
-                    <div className="rounded-md bg-spark-primary/30 px-1.5 py-1">
-                      <div className="text-[6px] uppercase text-spark-secondary/60">Growth</div>
-                      <div className="font-serif text-[11px] text-spark-secondary">+38%</div>
-                    </div>
-                  </div>
-                  {/* mini chart */}
-                  <div className="flex-1 rounded-md bg-spark-secondary/5 p-1">
-                    <svg viewBox="0 0 100 40" className="h-full w-full">
-                      <defs>
-                        <linearGradient id="orb-area" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#D4AF37" stopOpacity="0.5" />
-                          <stop offset="100%" stopColor="#D4AF37" stopOpacity="0" />
-                        </linearGradient>
-                      </defs>
-                      <path
-                        d="M0,32 C12,22 22,28 34,14 C46,4 58,18 70,10 C82,2 92,12 100,4"
-                        fill="none"
-                        stroke="#D4AF37"
-                        strokeWidth="1.4"
-                        strokeLinecap="round"
-                      />
-                      <path
-                        d="M0,32 C12,22 22,28 34,14 C46,4 58,18 70,10 C82,2 92,12 100,4 L100,40 L0,40 Z"
-                        fill="url(#orb-area)"
-                      />
-                    </svg>
-                  </div>
-                  {/* mini bars */}
-                  <div className="flex items-end gap-0.5">
-                    {[40, 65, 50, 80, 60, 90, 70].map((h, i) => (
-                      <div
-                        key={i}
-                        className="flex-1 rounded-t-sm bg-gradient-to-t from-spark-primary to-spark-accent"
-                        style={{ height: `${h * 0.4}px` }}
-                      />
-                    ))}
-                  </div>
+                {/* Concentric pulsing glow rings */}
+                <div className="absolute inset-4 rounded-full border border-spark-accent/30 animate-[spark-core-pulse-1_3s_ease-in-out_infinite]" />
+                <div className="absolute inset-4 rounded-full border border-spark-accent/15 animate-[spark-core-pulse-2_4s_ease-in-out_infinite]" />
+
+                {/* Orbiting gold particles */}
+                {Array.from({ length: 18 }).map((_, i) => {
+                  const size = 2 + (i % 3);
+                  const delay = -(i * 0.4);
+                  const isAccent = i % 3 === 0;
+                  return (
+                    <div
+                      key={i}
+                      className="absolute rounded-full pointer-events-none"
+                      style={{
+                        width: `${size}px`,
+                        height: `${size}px`,
+                        left: "50%",
+                        top: "50%",
+                        background: isAccent ? "#D4AF37" : "#F5F0E8",
+                        opacity: 0.8,
+                        boxShadow: `0 0 ${size * 3}px ${isAccent ? "rgba(212,175,55,0.8)" : "rgba(245,240,232,0.6)"}`,
+                        animation: `spark-particle-orbit-${i} ${8 + (i % 4) * 3}s linear infinite`,
+                        animationDelay: `${delay}s`,
+                      }}
+                    />
+                  );
+                })}
+
+                {/* SPARK TECHNOLOGY LOGO inside the circle, slowly rotating with soft breathing */}
+                <div className="relative z-10 flex h-36 w-36 items-center justify-center rounded-full sm:h-44 sm:w-44 animate-[logo-slow-rotate_40s_linear_infinite]">
+                  <svg viewBox="0 0 30 30" className="h-20 w-20 text-spark-accent drop-shadow-[0_0_15px_rgba(212,175,55,0.65)]">
+                    <path
+                      className="fill-spark-ink/80 stroke-spark-accent/40 stroke-[0.5]"
+                      d="M24.51,28.51H5.49c-2.21,0-4-1.79-4-4V5.49c0-2.21,1.79-4,4-4h19.03c2.21,0,4,1.79,4,4v19.03 C28.51,26.72,26.72,28.51,24.51,28.51z"
+                    />
+                    <g className="fill-spark-accent">
+                      <path d="M15.47,7.1l-1.3,1.85c-0.2,0.29-0.54,0.47-0.9,0.47h-7.1V7.09C6.16,7.1,15.47,7.1,15.47,7.1z" />
+                      <polygon points="24.3,7.1 13.14,22.91 5.7,22.91 16.86,7.1" />
+                      <path d="M14.53,22.91l1.31-1.86c0.2-0.29,0.54-0.47,0.9-0.47h7.09v2.33H14.53z" />
+                    </g>
+                  </svg>
                 </div>
               </div>
             </div>
