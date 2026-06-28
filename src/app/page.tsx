@@ -13,10 +13,12 @@ import { TechnologiesSection } from "@/components/spark/sections/TechnologiesSec
 import { CTASection } from "@/components/spark/sections/CTASection";
 import { Footer } from "@/components/spark/sections/Footer";
 import { ScrollProgress } from "@/components/spark/ui/ScrollProgress";
+import { PageLoader } from "@/components/spark/ui/PageLoader";
 
 export default function Home() {
   return (
     <div className="relative flex min-h-screen flex-col bg-spark-secondary">
+      <PageLoader />
       <ScrollProgress />
       <Navbar />
 

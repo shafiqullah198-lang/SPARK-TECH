@@ -118,7 +118,7 @@ function ServiceCard({ service, index }: { service: Service; index: number }) {
       onHoverEnd={() => setHover(false)}
       whileHover={{ y: -6 }}
       transition={{ type: "spring", stiffness: 280, damping: 22 }}
-      className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-spark-primary/12 bg-white/55 backdrop-blur-xl shadow-spark"
+      className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-spark-primary/12 bg-[#FFFDF9]/65 backdrop-blur-xl shadow-spark"
     >
       {/* visual top — real generated image */}
       <div className="relative aspect-[16/10] overflow-hidden">

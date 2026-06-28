@@ -54,13 +54,13 @@ export function Navbar() {
           initial={false}
           animate={{
             backgroundColor: scrolled
-              ? "rgba(245, 240, 232, 0.72)"
-              : "rgba(245, 240, 232, 0.0)",
+              ? "rgba(247, 243, 237, 0.76)"
+              : "rgba(247, 243, 237, 0.0)",
             borderColor: scrolled
-              ? "rgba(122, 31, 31, 0.10)"
+              ? "rgba(122, 31, 31, 0.06)"
               : "rgba(122, 31, 31, 0.0)",
             boxShadow: scrolled
-              ? "0 24px 60px -36px rgba(74,15,15,0.35)"
+              ? "0 18px 45px -20px rgba(122, 31, 31, 0.08)"
               : "0 0 0 0 rgba(0,0,0,0)",
           }}
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
@@ -135,6 +135,25 @@ export function Navbar() {
               className="mt-2 overflow-hidden rounded-3xl border border-spark-primary/10 bg-spark-secondary/85 p-3 backdrop-blur-xl md:hidden"
             >
               <div className="flex flex-col">
+                {/* Branded mobile header */}
+                <div className="flex items-center gap-2 px-3 py-2 border-b border-spark-primary/5 mb-2">
+                  <span className="relative grid h-7 w-7 place-items-center overflow-hidden rounded-lg bg-spark-ink shadow-sm">
+                    <img
+                      src={logo}
+                      alt={`${companyName} logo`}
+                      className="h-full w-full object-cover"
+                    />
+                  </span>
+                  <div className="flex flex-col leading-none">
+                    <span className="font-serif text-xs text-spark-ink font-semibold">
+                      {firstWord}
+                    </span>
+                    <span className="text-[8px] font-medium uppercase tracking-wider text-spark-muted">
+                      {restWords}
+                    </span>
+                  </div>
+                </div>
+
                 {NAV.map((item) => (
                   <a
                     key={item.label}

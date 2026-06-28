@@ -88,7 +88,7 @@ function TestimonialCard({ t }: { t: Testimonial }) {
     <motion.figure
       whileHover={{ y: -5 }}
       transition={{ type: "spring", stiffness: 280, damping: 22 }}
-      className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-spark-primary/12 bg-white/55 p-6 backdrop-blur-xl shadow-spark"
+      className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-spark-primary/12 bg-[#FFFDF9]/65 p-6 backdrop-blur-xl shadow-spark"
     >
       <Quote
         className={

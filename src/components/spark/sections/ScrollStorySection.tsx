@@ -40,13 +40,13 @@ const SERVICES: ServiceDef[] = [
 
 // background color per scene
 const SCENE_BGS = [
-  "#F5F0E8", // 1 — hero (cream)
-  "#F5F0E8", // 2 — rotate
+  "#F7F3ED", // 1 — hero (cream)
+  "#F7F3ED", // 2 — rotate
   "#9b3232", // 3 — explode (deep burgundy)
   "#4a0f0f", // 4 — mobile screens
-  "#1a0e0e", // 5 — service cards (ink)
-  "#1a0e0e", // 6 — parallax
-  "#1a0e0e", // 7 — portfolio depth
+  "#2D2520", // 5 — service cards (ink)
+  "#2D2520", // 6 — parallax
+  "#2D2520", // 7 — portfolio depth
   "#4a0f0f", // 8 — converge to CTA
 ];
 
@@ -68,6 +68,21 @@ export function ScrollStorySection() {
   const serviceCardsRef = React.useRef<HTMLDivElement>(null);
   const portfolioRef = React.useRef<HTMLDivElement>(null);
   const heroBgRef = React.useRef<HTMLDivElement>(null);
+
+  const floatingLeftRef = React.useRef<HTMLDivElement>(null);
+  const floatingRightRef = React.useRef<HTMLDivElement>(null);
+
+  const [mousePos, setMousePos] = React.useState({ x: 0, y: 0 });
+
+  React.useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      const x = (e.clientX / window.innerWidth) - 0.5;
+      const y = (e.clientY / window.innerHeight) - 0.5;
+      setMousePos({ x, y });
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
 
   React.useEffect(() => {
     if (!rootRef.current || !pinRef.current) return;
@@ -113,6 +128,8 @@ export function ScrollStorySection() {
       gsap.set(coreInnerRef.current, { rotationY: 0, rotationX: 0 });
       gsap.set(headlineRef.current, { y: 0, opacity: 1 });
       gsap.set(subRef.current, { y: 0, opacity: 1 });
+      gsap.set(floatingLeftRef.current, { x: 0, opacity: 1, scale: 1 });
+      gsap.set(floatingRightRef.current, { x: 0, opacity: 1, scale: 1 });
 
       // Scene 1 just holds the hero visible — no transform needed (it's the start state)
       // Add a subtle floating pulse for cinematic feel
@@ -137,6 +154,12 @@ export function ScrollStorySection() {
       }, seg);
       tl.to(subRef.current, {
         y: -20, opacity: 0, duration: seg * 0.3, ease: "power2.in"
+      }, seg);
+      tl.to(floatingLeftRef.current, {
+        x: -120, opacity: 0, scale: 0.85, duration: seg * 0.4, ease: "power2.in"
+      }, seg);
+      tl.to(floatingRightRef.current, {
+        x: 120, opacity: 0, scale: 0.85, duration: seg * 0.4, ease: "power2.in"
       }, seg);
       setSceneLabel(tl, 1, "02 · Rotate", seg);
 
@@ -378,13 +401,111 @@ export function ScrollStorySection() {
           </div>
         </div>
 
+        {/* ============ LEFT FLOATING DEVICES (Scene 1-2) ============ */}
+        <div
+          ref={floatingLeftRef}
+          className="absolute left-[-2%] sm:left-[2%] md:left-[5%] top-[14%] z-20 hidden md:flex flex-col gap-6 pointer-events-none"
+          style={{
+            transform: `translate(${mousePos.x * -35}px, ${mousePos.y * -35}px)`,
+            transition: "transform 0.2s ease-out",
+          }}
+        >
+          {/* Phone mockup 1 */}
+          <div
+            className="relative w-44 h-80 rounded-[36px] border-4 border-spark-ink/80 bg-[#FFFDF9] shadow-spark overflow-hidden animate-spark-float"
+            style={{
+              transform: "rotateY(20deg) rotateX(10deg) rotateZ(-3deg)",
+              transformStyle: "preserve-3d",
+            }}
+          >
+            <div className="absolute left-1/2 top-2 h-3.5 w-14 -translate-x-1/2 rounded-full bg-spark-ink" />
+            <img
+              src="/assets/portfolio/verdant.png"
+              alt="Verdant App"
+              className="h-full w-full object-cover opacity-90 mt-2 rounded-[28px]"
+            />
+          </div>
+          {/* Phone mockup 2 */}
+          <div
+            className="relative w-36 h-64 rounded-[30px] border-4 border-spark-ink/80 bg-[#FFFDF9] shadow-spark overflow-hidden animate-spark-float-slow mt-[-30px] ml-16"
+            style={{
+              transform: "rotateY(16deg) rotateX(-8deg) rotateZ(5deg)",
+              transformStyle: "preserve-3d",
+              animationDelay: "-2s",
+            }}
+          >
+            <div className="absolute left-1/2 top-1.5 h-3 w-10 -translate-x-1/2 rounded-full bg-spark-ink" />
+            <img
+              src="/assets/services/mobile-apps.png"
+              alt="Mobile App"
+              className="h-full w-full object-cover opacity-95 mt-1 rounded-[24px]"
+            />
+          </div>
+        </div>
+
+        {/* ============ RIGHT FLOATING SERVICE CARDS (Scene 1-2) ============ */}
+        <div
+          ref={floatingRightRef}
+          className="absolute right-[-2%] sm:right-[2%] md:right-[5%] top-[16%] z-20 hidden md:flex flex-col gap-6 pointer-events-none"
+          style={{
+            transform: `translate(${mousePos.x * 35}px, ${mousePos.y * 35}px)`,
+            transition: "transform 0.2s ease-out",
+          }}
+        >
+          {/* Card 1: Web Development */}
+          <div
+            className="glass p-4 rounded-2xl w-56 flex flex-col shadow-spark animate-spark-float"
+            style={{
+              transform: "rotateY(-18deg) rotateX(10deg) rotateZ(3deg)",
+              transformStyle: "preserve-3d",
+              animationDelay: "-1s",
+            }}
+          >
+            <div className="flex items-center gap-1.5 mb-2.5">
+              <span className="h-2 w-2 rounded-full bg-[#7A1F1F]" />
+              <span className="h-2 w-2 rounded-full bg-[#D4AF37]" />
+              <span className="h-2 w-2 rounded-full bg-[#D4AF37]/50" />
+              <span className="ml-auto text-[7px] font-mono text-spark-muted">web.engine</span>
+            </div>
+            <img
+              src="/assets/services/web-dev.png"
+              alt="Web Dev"
+              className="h-24 w-full object-cover rounded-lg mb-2"
+            />
+            <div className="text-[10px] font-semibold text-spark-ink">Website Dev</div>
+            <div className="text-[8px] text-spark-muted">React & Next.js</div>
+          </div>
+          {/* Card 2: Analytics dial */}
+          <div
+            className="glass p-4 rounded-2xl w-48 flex flex-col shadow-spark animate-spark-float-slow mt-[-10px] mr-12 align-self-end"
+            style={{
+              transform: "rotateY(-15deg) rotateX(-6deg) rotateZ(-4deg)",
+              transformStyle: "preserve-3d",
+              animationDelay: "-3s",
+            }}
+          >
+            <img
+              src="/assets/services/analytics.png"
+              alt="Analytics"
+              className="h-20 w-full object-cover rounded-lg mb-2"
+            />
+            <div className="text-[10px] font-semibold text-spark-accent">Analytics</div>
+            <div className="text-[8px] text-spark-muted">99.9% uptime</div>
+          </div>
+        </div>
+
         {/* ============ CENTRAL OBJECT ============ */}
         <div className="absolute inset-0 flex items-center justify-center">
           {/* The Spark Core — glowing orb with rotating ring + inner dashboard preview */}
           <div
             ref={coreRef}
             className="relative will-change-transform"
-            style={{ transformStyle: "preserve-3d", perspective: "1200px" }}
+            style={{
+              transform: `translate(${mousePos.x * 24}px, ${mousePos.y * 24}px)`,
+              transition: "transform 0.2s ease-out",
+              transformStyle: "preserve-3d",
+              perspective: "1200px"
+            }}
           >
             <div
               ref={coreInnerRef}
@@ -413,21 +534,21 @@ export function ScrollStorySection() {
                 style={{ animation: "spark-spin-slow 22s linear infinite reverse" }}
               />
               {/* outer glow halos */}
-              <div className="absolute -inset-12 rounded-full bg-spark-accent/30 blur-3xl animate-pulse" />
-              <div className="absolute -inset-8 rounded-full bg-spark-primary/25 blur-2xl" />
-              <div className="absolute -inset-4 rounded-full bg-spark-accent/15 blur-xl" />
+              <div className="absolute -inset-12 rounded-full bg-spark-accent/20 blur-3xl animate-pulse" />
+              <div className="absolute -inset-8 rounded-full bg-spark-accent/15 blur-2xl" />
+              <div className="absolute -inset-4 rounded-full bg-spark-accent/10 blur-xl" />
 
               {/* core sphere with Spark Technology Logo (Option 1) */}
-              <div className="relative grid h-52 w-52 place-items-center overflow-hidden rounded-full bg-gradient-to-br from-spark-primary via-spark-primary-soft to-spark-accent shadow-spark sm:h-64 sm:w-64 animate-[core-breathe_4s_ease-in-out_infinite]">
-                {/* dark inner backdrop */}
-                <div className="absolute inset-3 rounded-full bg-spark-ink/75 backdrop-blur-md" />
+              <div className="relative grid h-52 w-52 place-items-center overflow-hidden rounded-full bg-gradient-to-br from-spark-accent via-white to-spark-accent shadow-spark sm:h-64 sm:w-64 animate-[core-breathe_4s_ease-in-out_infinite]">
+                {/* light inner backdrop */}
+                <div className="absolute inset-3 rounded-full bg-white/95 backdrop-blur-md" />
 
                 {/* highlight */}
-                <div className="absolute left-8 top-8 h-16 w-16 rounded-full bg-white/20 blur-xl" />
+                <div className="absolute left-8 top-8 h-16 w-16 rounded-full bg-spark-accent/25 blur-xl" />
 
                 {/* Concentric pulsing glow rings */}
-                <div className="absolute inset-4 rounded-full border border-spark-accent/30 animate-[spark-core-pulse-1_3s_ease-in-out_infinite]" />
-                <div className="absolute inset-4 rounded-full border border-spark-accent/15 animate-[spark-core-pulse-2_4s_ease-in-out_infinite]" />
+                <div className="absolute inset-4 rounded-full border border-spark-accent/40 animate-[spark-core-pulse-1_3s_ease-in-out_infinite]" />
+                <div className="absolute inset-4 rounded-full border border-spark-primary/20 animate-[spark-core-pulse-2_4s_ease-in-out_infinite]" />
 
                 {/* Orbiting gold particles */}
                 {Array.from({ length: 18 }).map((_, i) => {
@@ -489,7 +610,7 @@ export function ScrollStorySection() {
           {/* ============ MOBILE SCREENS (Scene 4) ============ */}
           <div
             ref={mobileScreensRef}
-            className="pointer-events-none absolute inset-0 flex items-center justify-center gap-6"
+            className="pointer-events-none absolute inset-0 flex items-center justify-center gap-3 sm:gap-6 scale-[0.7] xs:scale-[0.8] sm:scale-100 transition-transform duration-300"
             style={{ display: "none" }}
           >
             {[
