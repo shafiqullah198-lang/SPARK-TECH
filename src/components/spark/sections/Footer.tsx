@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Sparkles, Github, Twitter, Linkedin, Dribbble, ArrowUpRight } from "lucide-react";
+import { Github, Twitter, Linkedin, Dribbble, ArrowUpRight } from "lucide-react";
 
 const FOOTER_NAV: { title: string; links: { label: string; href: string }[] }[] = [
   {
@@ -63,9 +63,12 @@ export function Footer() {
           {/* brand block */}
           <div className="lg:col-span-4">
             <a href="#top" className="inline-flex items-center gap-2.5">
-              <span className="relative grid h-10 w-10 place-items-center overflow-hidden rounded-full bg-spark-primary text-spark-secondary shadow-spark">
-                <Sparkles className="h-4 w-4" strokeWidth={2.2} />
-                <span className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-spark-accent" />
+              <span className="relative grid h-11 w-11 place-items-center overflow-hidden rounded-xl bg-spark-ink shadow-spark">
+                <img
+                  src="/assets/spark-logo.jpg"
+                  alt="Spark Technology logo"
+                  className="h-full w-full object-cover"
+                />
               </span>
               <div className="flex flex-col leading-none">
                 <span className="font-serif text-base tracking-wide text-spark-ink">
@@ -169,15 +172,31 @@ export function Footer() {
             </span>
           </div>
         </div>
-      </div>
 
-      {/* giant brand wordmark */}
-      <div
-        aria-hidden
-        className="pointer-events-none mt-8 select-none overflow-hidden"
-      >
-        <div className="-mb-6 whitespace-nowrap text-center font-serif text-[clamp(4rem,18vw,16rem)] leading-none text-spark-primary/10 sm:-mb-10">
-          Spark Technology
+        {/* compact brand signature strip */}
+        <div className="border-t border-spark-primary/10 py-8">
+          <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
+            <div className="flex items-center gap-2.5">
+              <span className="relative grid h-8 w-8 place-items-center overflow-hidden rounded-lg bg-spark-ink">
+                <img
+                  src="/assets/spark-logo.jpg"
+                  alt="Spark Technology logo"
+                  className="h-full w-full object-cover"
+                />
+              </span>
+              <span className="font-serif text-sm text-spark-ink">
+                Spark Technology
+              </span>
+            </div>
+            <p className="max-w-md text-center text-[11px] leading-relaxed text-spark-muted sm:text-right">
+              Designed & engineered with care. Crafted for ambitious brands
+              worldwide — let's build the future, together.
+            </p>
+            <div className="flex items-center gap-2 text-[11px] text-spark-muted">
+              <span className="h-1 w-1 rounded-full bg-spark-accent" />
+              <span>Made with passion</span>
+            </div>
+          </div>
         </div>
       </div>
     </footer>

@@ -23,19 +23,19 @@ if (typeof window !== "undefined") {
    - Everything is scrubbed to scroll position (1s lag for smoothness)
    ============================================================ */
 
-type ServiceDef = { icon: LucideIcon; label: string; color: string };
+type ServiceDef = { icon: LucideIcon; label: string; desc: string; color: string };
 
 const SERVICES: ServiceDef[] = [
-  { icon: Code2,        label: "Web Dev",        color: "#7A1F1F" },
-  { icon: Smartphone,   label: "Mobile Apps",    color: "#D4AF37" },
-  { icon: Boxes,        label: "ERP Systems",    color: "#7A1F1F" },
-  { icon: Users,        label: "CRM Solutions",  color: "#D4AF37" },
-  { icon: Palette,      label: "UI/UX Design",   color: "#7A1F1F" },
-  { icon: PenTool,      label: "Graphic Design", color: "#D4AF37" },
-  { icon: Share2,       label: "Social Media",   color: "#7A1F1F" },
-  { icon: Sparkles,     label: "Branding",       color: "#D4AF37" },
-  { icon: ShoppingBag,  label: "E-commerce",     color: "#7A1F1F" },
-  { icon: BarChart3,    label: "Analytics",      color: "#D4AF37" },
+  { icon: Code2,        label: "Web Dev",        desc: "Next.js + Edge",     color: "#7A1F1F" },
+  { icon: Smartphone,   label: "Mobile Apps",    desc: "iOS + Android",      color: "#D4AF37" },
+  { icon: Boxes,        label: "ERP Systems",    desc: "Unified ops",        color: "#7A1F1F" },
+  { icon: Users,        label: "CRM Solutions",  desc: "Pipelines + AI",     color: "#D4AF37" },
+  { icon: Palette,      label: "UI/UX Design",   desc: "Design systems",     color: "#7A1F1F" },
+  { icon: PenTool,      label: "Graphic Design", desc: "Decks + motion",     color: "#D4AF37" },
+  { icon: Share2,       label: "Social Media",   desc: "Paid + community",   color: "#7A1F1F" },
+  { icon: Sparkles,     label: "Branding",       desc: "Identity + voice",   color: "#D4AF37" },
+  { icon: ShoppingBag,  label: "E-commerce",     desc: "Shopify + headless", color: "#7A1F1F" },
+  { icon: BarChart3,    label: "Analytics",      desc: "BI + dashboards",    color: "#D4AF37" },
 ];
 
 // background color per scene
@@ -392,19 +392,42 @@ export function ScrollStorySection() {
               return (
                 <div
                   key={s.label}
-                  className="service-card group relative flex aspect-square flex-col items-center justify-center gap-2 rounded-2xl border border-spark-accent/25 bg-white/8 p-2 backdrop-blur-md sm:p-4"
+                  className="service-card group relative flex aspect-square flex-col items-center justify-between gap-1 overflow-hidden rounded-2xl border border-spark-accent/30 bg-white/10 p-2.5 backdrop-blur-md sm:p-4"
                   style={{ transformStyle: "preserve-3d" }}
                 >
+                  {/* gradient sheen */}
                   <div
-                    className="grid h-8 w-8 place-items-center rounded-xl sm:h-12 sm:w-12"
-                    style={{ background: `${s.color}22`, color: s.color }}
-                  >
-                    <Icon className="h-4 w-4 sm:h-6 sm:w-6" strokeWidth={1.8} />
+                    className="absolute inset-0 opacity-50"
+                    style={{
+                      background: `radial-gradient(circle at 50% 0%, ${s.color}33, transparent 70%)`,
+                    }}
+                  />
+                  {/* top row: icon + number */}
+                  <div className="relative flex w-full items-center justify-between">
+                    <div
+                      className="grid h-7 w-7 place-items-center rounded-lg sm:h-10 sm:w-10"
+                      style={{ background: `${s.color}33`, color: s.color }}
+                    >
+                      <Icon className="h-3.5 w-3.5 sm:h-5 sm:w-5" strokeWidth={1.8} />
+                    </div>
+                    <span className="font-serif text-[8px] text-spark-secondary/40 sm:text-[10px]">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
                   </div>
-                  <div className="text-center text-[9px] font-medium text-spark-secondary sm:text-xs">
-                    {s.label}
+                  {/* title + desc */}
+                  <div className="relative w-full text-center">
+                    <div className="text-[10px] font-semibold text-spark-secondary sm:text-sm">
+                      {s.label}
+                    </div>
+                    <div className="mt-0.5 text-[7px] uppercase tracking-wider text-spark-accent/80 sm:text-[9px]">
+                      {s.desc}
+                    </div>
                   </div>
-                  <div className="absolute inset-0 rounded-2xl border border-transparent transition-colors group-hover:border-spark-accent/40" />
+                  {/* bottom accent line */}
+                  <div
+                    className="relative h-0.5 w-full rounded-full"
+                    style={{ background: `linear-gradient(90deg, transparent, ${s.color}, transparent)` }}
+                  />
                 </div>
               );
             })}

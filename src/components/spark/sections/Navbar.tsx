@@ -2,9 +2,8 @@
 
 import * as React from "react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
-import { Menu, X, Sparkles } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { MagneticButton } from "../ui/MagneticButton";
-import { cn } from "@/lib/utils";
 
 const NAV = [
   { label: "Services", href: "#services" },
@@ -54,9 +53,13 @@ export function Navbar() {
         >
           {/* Logo */}
           <a href="#top" className="group flex items-center gap-2.5">
-            <span className="relative grid h-9 w-9 place-items-center overflow-hidden rounded-full bg-spark-primary text-spark-secondary shadow-spark">
-              <Sparkles className="h-4 w-4" strokeWidth={2.2} />
-              <span className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-spark-accent animate-pulse" />
+            <span className="relative grid h-10 w-10 place-items-center overflow-hidden rounded-xl bg-spark-ink shadow-spark">
+              <img
+                src="/assets/spark-logo.jpg"
+                alt="Spark Technology logo"
+                className="h-full w-full object-cover"
+              />
+              <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-spark-accent animate-pulse" />
             </span>
             <div className="flex flex-col leading-none">
               <span className="font-serif text-[15px] tracking-wide text-spark-ink">

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { SectionHeading } from "../ui/SectionHeading";
 import { StaggerGroup, StaggerItem } from "../ui/Stagger";
@@ -81,18 +81,9 @@ const PROJECTS: Project[] = [
 ];
 
 export function PortfolioSection() {
-  const ref = React.useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
-  // parallax for whole grid
-  const gridY = useTransform(scrollYProgress, [0, 1], ["4%", "-4%"]);
-
   return (
     <section
       id="portfolio"
-      ref={ref}
       className="relative overflow-hidden bg-spark-secondary py-24 sm:py-32"
     >
       <div className="pointer-events-none absolute inset-0 bg-grid opacity-50" />
@@ -127,27 +118,23 @@ export function PortfolioSection() {
           </motion.a>
         </div>
 
-        <motion.div
-          style={{ y: gridY }}
+        <StaggerGroup
           className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+          stagger={0.08}
         >
-          <StaggerGroup className="contents" stagger={0.08}>
-            {PROJECTS.map((p, i) => (
-              <StaggerItem
-                key={p.client}
-                className={
-                  p.size === "lg"
-                    ? "sm:col-span-2 lg:col-span-2"
-                    : p.size === "md"
-                    ? ""
-                    : ""
-                }
-              >
-                <ProjectCard project={p} index={i} />
-              </StaggerItem>
-            ))}
-          </StaggerGroup>
-        </motion.div>
+          {PROJECTS.map((p, i) => (
+            <StaggerItem
+              key={p.client}
+              className={
+                p.size === "lg"
+                  ? "sm:col-span-2 lg:col-span-2"
+                  : ""
+              }
+            >
+              <ProjectCard project={p} index={i} />
+            </StaggerItem>
+          ))}
+        </StaggerGroup>
       </div>
     </section>
   );
