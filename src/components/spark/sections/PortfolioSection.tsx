@@ -13,6 +13,7 @@ type Project = {
   result: string;
   metric: string;
   metricLabel: string;
+  image: string;
   palette: string; // tailwind gradient classes
   size: "lg" | "md" | "sm";
 };
@@ -25,6 +26,7 @@ const PROJECTS: Project[] = [
     result: "Migrated a legacy Shopify storefront to a custom headless build with edge personalization.",
     metric: "3.1×",
     metricLabel: "Conversion",
+    image: "/assets/portfolio/northpeak.png",
     palette: "from-spark-primary to-spark-primary-deep",
     size: "lg",
   },
@@ -35,6 +37,7 @@ const PROJECTS: Project[] = [
     result: "Designed and engineered a real-time risk dashboard processing 4B events/day.",
     metric: "4B",
     metricLabel: "Events/day",
+    image: "/assets/portfolio/lumen.png",
     palette: "from-spark-accent to-spark-primary",
     size: "md",
   },
@@ -45,6 +48,7 @@ const PROJECTS: Project[] = [
     result: "Replaced 9 disconnected tools with a single custom ERP — inventory, finance, HR.",
     metric: "9→1",
     metricLabel: "Tools unified",
+    image: "/assets/portfolio/atlas.png",
     palette: "from-spark-primary-deep to-spark-primary-soft",
     size: "md",
   },
@@ -55,6 +59,7 @@ const PROJECTS: Project[] = [
     result: "Cross-platform app with offline-first sync and gamified carbon tracking.",
     metric: "250K",
     metricLabel: "Monthly users",
+    image: "/assets/portfolio/verdant.png",
     palette: "from-spark-accent to-spark-accent-soft",
     size: "sm",
   },
@@ -65,6 +70,7 @@ const PROJECTS: Project[] = [
     result: "End-to-end rebrand — naming, logo, voice, guidelines and investor deck.",
     metric: "$28M",
     metricLabel: "Series A raised",
+    image: "/assets/portfolio/quantica.png",
     palette: "from-spark-primary-soft to-spark-accent",
     size: "sm",
   },
@@ -75,6 +81,7 @@ const PROJECTS: Project[] = [
     result: "Customer platform with predictive churn scoring and automated retention plays.",
     metric: "−41%",
     metricLabel: "Churn",
+    image: "/assets/portfolio/helix.png",
     palette: "from-spark-primary to-spark-accent",
     size: "md",
   },
@@ -170,43 +177,34 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
       transition={{ type: "spring", stiffness: 280, damping: 22 }}
       className="group relative h-full overflow-hidden rounded-3xl border border-spark-primary/12 bg-white/55 backdrop-blur-xl shadow-spark"
     >
-      {/* visual */}
+      {/* visual — real project screenshot */}
       <div className="relative aspect-[16/10] overflow-hidden">
-        <div
-          className={`absolute inset-0 bg-gradient-to-br ${project.palette} opacity-90`}
+        <img
+          src={project.image}
+          alt={`${project.client} — ${project.category}`}
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
         />
-        <div className="absolute inset-0 bg-grid-gold opacity-30 mix-blend-overlay" />
-        <div className="absolute inset-0 bg-gradient-to-t from-spark-ink/40 via-transparent to-transparent" />
+        {/* brand tint overlay */}
+        <div className={`absolute inset-0 bg-gradient-to-br ${project.palette} opacity-40 mix-blend-multiply`} />
+        <div className="absolute inset-0 bg-gradient-to-t from-spark-ink/75 via-spark-ink/15 to-transparent" />
 
-        {/* mock browser frame */}
-        <div className="absolute inset-x-6 top-6 bottom-0 rounded-t-xl border border-white/30 bg-white/10 backdrop-blur-sm">
-          <div className="flex items-center gap-1 border-b border-white/20 px-3 py-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-white/60" />
-            <span className="h-1.5 w-1.5 rounded-full bg-white/60" />
-            <span className="h-1.5 w-1.5 rounded-full bg-white/60" />
-            <div className="ml-2 flex-1 rounded-full bg-white/20 px-2 py-0.5 text-[8px] text-white/80">
-              {project.client.toLowerCase().replace(/\s/g, "")}.com
-            </div>
-          </div>
-        </div>
-
-        {/* metric chip */}
+        {/* metric chip — depth on hover */}
         <motion.div
           style={{ transform: "translateZ(40px)" }}
-          className="absolute right-4 top-4 rounded-2xl border border-white/30 bg-white/15 px-3 py-2 text-right backdrop-blur-md"
+          className="absolute right-4 top-4 rounded-2xl border border-white/30 bg-spark-ink/50 px-3 py-2 text-right backdrop-blur-md"
         >
-          <div className="font-serif text-2xl text-white">{project.metric}</div>
-          <div className="text-[9px] uppercase tracking-[0.16em] text-white/80">
+          <div className="font-serif text-2xl text-white drop-shadow">{project.metric}</div>
+          <div className="text-[9px] uppercase tracking-[0.16em] text-white/85">
             {project.metricLabel}
           </div>
         </motion.div>
 
         {/* client tag */}
         <div className="absolute bottom-4 left-4 flex items-center gap-2">
-          <span className="rounded-full bg-white/20 px-3 py-1 text-[10px] font-medium uppercase tracking-wide text-white backdrop-blur-md">
+          <span className="rounded-full border border-white/30 bg-spark-ink/40 px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-white backdrop-blur-md">
             {project.client}
           </span>
-          <span className="text-[10px] text-white/70">{project.category}</span>
+          <span className="text-[10px] text-white/80">{project.category}</span>
         </div>
       </div>
 
