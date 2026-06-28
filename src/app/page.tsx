@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Navbar } from "@/components/spark/sections/Navbar";
-import { HeroSection } from "@/components/spark/sections/HeroSection";
+import { ScrollStorySection } from "@/components/spark/sections/ScrollStorySection";
 import { TrustedBySection } from "@/components/spark/sections/TrustedBySection";
 import { ServicesSection } from "@/components/spark/sections/ServicesSection";
 import { WhyChooseUs } from "@/components/spark/sections/WhyChooseUs";
@@ -21,22 +21,36 @@ export default function Home() {
       <Navbar />
 
       <main className="flex-1">
-        {/* Scene 1–3 — Hero appears with floating ERP dashboard that drifts on scroll */}
-        <HeroSection />
+        {/*
+          CINEMATIC SCROLL STORY (replaces static hero)
+          - GSAP ScrollTrigger-pinned for 800vh
+          - One persistent "Spark Core" object transforms through 8 scenes:
+            1. Hero with floating core
+            2. Core rotates in 3D
+            3. Core explodes into 12 shards
+            4. Shards transform into mobile app screens
+            5. Screens assemble into 10 service cards
+            6. Cards drift in parallax
+            7. Portfolio frames zoom in with depth
+            8. Everything converges into final CTA
+          - Background color shifts per scene (cream → burgundy → ink → CTA)
+          - Matches the scroll-pinned cinematic reference style
+        */}
+        <ScrollStorySection />
 
         {/* Trust strip — partner logos marquee */}
         <TrustedBySection />
 
-        {/* Scene 4–5 — Dashboard shards converge into 10 service cards */}
+        {/* Detailed services grid */}
         <ServicesSection />
 
-        {/* Why Choose Us — premium dark section with parallax glow */}
+        {/* Why Choose Us — premium dark section */}
         <WhyChooseUs />
 
-        {/* Scene 6 — Process timeline with scroll-drawn progress line */}
+        {/* Process timeline with scroll-drawn progress line */}
         <ProcessSection />
 
-        {/* Scene 7 — Portfolio cards with depth, perspective and tilt */}
+        {/* Portfolio cards with depth, perspective and tilt */}
         <PortfolioSection />
 
         {/* Testimonials */}
@@ -45,7 +59,7 @@ export default function Home() {
         {/* Technologies we use */}
         <TechnologiesSection />
 
-        {/* Scene 8 — Everything converges into final CTA */}
+        {/* Final CTA */}
         <CTASection />
       </main>
 
