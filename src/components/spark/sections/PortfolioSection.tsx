@@ -6,6 +6,7 @@ import { ArrowUpRight } from "lucide-react";
 import { SectionHeading } from "../ui/SectionHeading";
 import { StaggerGroup, StaggerItem } from "../ui/Stagger";
 import { getPortfolio } from "@/lib/api";
+import Image from "next/image";
 
 type Project = {
   client: string;
@@ -153,16 +154,18 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           </div>
         )}
 
-        <img
+        <Image
           src={imgSrc}
           alt={`${project.client} — ${project.category}`}
+          fill
           loading="lazy"
           onLoad={() => setImgLoaded(true)}
           onError={() => {
             setImgSrc("/assets/portfolio/northpeak.png");
             setImgLoaded(true);
           }}
-          className={`absolute inset-0 h-full w-full object-cover transition-all duration-700 ease-out group-hover:scale-110 ${
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className={`object-cover transition-all duration-700 ease-out group-hover:scale-110 ${
             imgLoaded ? "opacity-100 scale-100" : "opacity-0 scale-95"
           }`}
         />
