@@ -9,10 +9,12 @@ import {
 import { SectionHeading } from "../ui/SectionHeading";
 import { StaggerGroup, StaggerItem } from "../ui/Stagger";
 import { cn } from "@/lib/utils";
+import { getServices } from "@/lib/api";
 
 type Service = {
-  icon: LucideIcon;
+  id?: number;
   title: string;
+  slug: string;
   desc: string;
   bullets: string[];
   accent: "primary" | "gold";
@@ -20,92 +22,41 @@ type Service = {
   span?: boolean;
 };
 
-const SERVICES: Service[] = [
-  {
-    icon: Code2,
-    title: "Website Development",
-    desc: "Cinematic marketing sites, headless commerce and high-performance platforms engineered for speed and scale.",
-    bullets: ["Next.js / React", "Headless CMS", "Edge rendering"],
-    accent: "primary",
-    image: "/assets/services/web-dev.png",
-    span: true,
-  },
-  {
-    icon: Smartphone,
-    title: "Mobile App Development",
-    desc: "Native-feel iOS & Android apps with offline-first architecture and 60fps motion.",
-    bullets: ["React Native", "Flutter", "Push & deep links"],
-    accent: "gold",
-    image: "/assets/services/mobile-apps.png",
-  },
-  {
-    icon: Boxes,
-    title: "ERP Systems",
-    desc: "Unified ERP backbones that connect inventory, finance, HR and operations into one source of truth.",
-    bullets: ["Custom modules", "Real-time sync", "Role-based access"],
-    accent: "primary",
-    image: "/assets/services/erp.png",
-  },
-  {
-    icon: Users,
-    title: "CRM Solutions",
-    desc: "Customer platforms that turn pipelines into revenue — automations, dashboards and AI insights.",
-    bullets: ["Sales pipelines", "Automations", "Analytics"],
-    accent: "gold",
-    image: "/assets/services/crm.png",
-  },
-  {
-    icon: Palette,
-    title: "UI/UX Design",
-    desc: "Research-led product design — flows, prototypes and design systems that ship in weeks, not months.",
-    bullets: ["Discovery", "Design systems", "Prototyping"],
-    accent: "primary",
-    image: "/assets/services/uiux.png",
-  },
-  {
-    icon: PenTool,
-    title: "Graphic Design",
-    desc: "Editorial-grade visual assets — from pitch decks to social kits and motion graphics.",
-    bullets: ["Pitch decks", "Social kits", "Motion"],
-    accent: "gold",
-    image: "/assets/services/graphic.png",
-  },
-  {
-    icon: Share2,
-    title: "Social Media Marketing",
-    desc: "Performance creative + community ops that compound reach and convert attention into revenue.",
-    bullets: ["Content calendars", "Paid social", "Community"],
-    accent: "primary",
-    image: "/assets/services/social.png",
-  },
-  {
-    icon: Sparkles,
-    title: "Branding",
-    desc: "Strategic brand systems — naming, identity, voice and guidelines built to scale across surfaces.",
-    bullets: ["Identity", "Voice", "Guidelines"],
-    accent: "gold",
-    image: "/assets/services/branding.png",
-  },
-  {
-    icon: ShoppingBag,
-    title: "E-commerce Development",
-    desc: "Conversion-engineered storefronts on Shopify, custom or headless — built to scale to 8 figures.",
-    bullets: ["Shopify / Headless", "Subscriptions", "A/B testing"],
-    accent: "primary",
-    image: "/assets/services/ecommerce.png",
-    span: true,
-  },
-  {
-    icon: BarChart3,
-    title: "Analytics & Reporting",
-    desc: "Unified dashboards that connect every channel into one source of truth — and the insights to act on it.",
-    bullets: ["BI dashboards", "ETL pipelines", "AI insights"],
-    accent: "gold",
-    image: "/assets/services/analytics.png",
-  },
-];
+const ICON_MAP: Record<string, LucideIcon> = {
+  "website-development": Code2,
+  "mobile-app-development": Smartphone,
+  "erp-systems": Boxes,
+  "crm-solutions": Users,
+  "ui-ux-design": Palette,
+  "graphic-design": PenTool,
+  "social-media-marketing": Share2,
+  "branding": Sparkles,
+  "e-commerce-development": ShoppingBag,
+  "analytics-reporting": BarChart3,
+};
 
 export function ServicesSection() {
+  const [services, setServices] = React.useState<Service[]>([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    getServices().then((data: any) => {
+      // Map API fields if they are different
+      const formatted = data.map((item: any) => ({
+        id: item.id,
+        title: item.title,
+        slug: item.slug,
+        desc: item.desc || item.short_description,
+        bullets: Array.isArray(item.bullets) ? item.bullets : (item.bullets ? item.bullets.split(",") : []),
+        accent: item.accent || "primary",
+        image: item.image || item.image_path,
+        span: item.span || false,
+      }));
+      setServices(formatted);
+      setLoading(false);
+    });
+  }, []);
+
   return (
     <section
       id="services"
@@ -128,26 +79,37 @@ export function ServicesSection() {
           description="From the first wireframe to the final dashboard, Spark ships end-to-end digital products — design, engineering, brand and growth under one roof."
         />
 
-        <StaggerGroup
-          className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
-          stagger={0.07}
-        >
-          {SERVICES.map((s, i) => (
-            <StaggerItem
-              key={s.title}
-              className={cn(s.span && "sm:col-span-2 lg:col-span-1")}
-            >
-              <ServiceCard service={s} index={i} />
-            </StaggerItem>
-          ))}
-        </StaggerGroup>
+        {loading ? (
+          <div className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div
+                key={i}
+                className="h-96 w-full animate-pulse rounded-3xl border border-spark-primary/10 bg-white/30 backdrop-blur-md"
+              />
+            ))}
+          </div>
+        ) : (
+          <StaggerGroup
+            className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+            stagger={0.07}
+          >
+            {services.map((s, i) => (
+              <StaggerItem
+                key={s.slug || s.title}
+                className={cn(s.span && "sm:col-span-2 lg:col-span-1")}
+              >
+                <ServiceCard service={s} index={i} />
+              </StaggerItem>
+            ))}
+          </StaggerGroup>
+        )}
       </div>
     </section>
   );
 }
 
 function ServiceCard({ service, index }: { service: Service; index: number }) {
-  const Icon = service.icon;
+  const Icon = ICON_MAP[service.slug] || Code2;
   const [hover, setHover] = React.useState(false);
 
   return (
@@ -160,11 +122,17 @@ function ServiceCard({ service, index }: { service: Service; index: number }) {
     >
       {/* visual top — real generated image */}
       <div className="relative aspect-[16/10] overflow-hidden">
-        <img
-          src={service.image}
-          alt={service.title}
-          className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
-        />
+        {service.image ? (
+          <img
+            src={service.image}
+            alt={service.title}
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-spark-ink flex items-center justify-center">
+            <Icon className="h-10 w-10 text-spark-accent" />
+          </div>
+        )}
         {/* gradient overlay for legibility */}
         <div className="absolute inset-0 bg-gradient-to-t from-spark-ink/75 via-spark-ink/20 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-br from-spark-primary/25 to-spark-accent/15 mix-blend-overlay" />
@@ -227,7 +195,9 @@ function ServiceCard({ service, index }: { service: Service; index: number }) {
                 : "border-spark-primary/30 bg-spark-primary/10 text-spark-primary"
             )}
           >
-            <ArrowUpRight className="h-3.5 w-3.5" />
+            <a href="#contact">
+              <ArrowUpRight className="h-3.5 w-3.5" />
+            </a>
           </motion.span>
         </div>
       </div>

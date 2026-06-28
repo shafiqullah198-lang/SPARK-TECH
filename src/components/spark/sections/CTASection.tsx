@@ -8,24 +8,16 @@ import {
   useSpring,
   MotionValue,
 } from "framer-motion";
-import { ArrowUpRight, Mail, Calendar } from "lucide-react";
+import { ArrowUpRight, Mail, Calendar, Sparkles } from "lucide-react";
 import { MagneticButton } from "../ui/MagneticButton";
-
-/**
- * CTASection — Scene 8 of the scroll storyboard.
- *
- * As the user scrolls into the final section, scattered "shards" reassemble
- * into a single glowing panel — visualizing the "everything converges" beat.
- * Built with Framer Motion scroll-driven transforms; no Three.js needed here.
- */
+import { useToast } from "@/hooks/use-toast";
+import { submitInquiry } from "@/lib/api";
 
 type Shard = {
   id: number;
-  // start position (scattered)
-  sx: number; // -50..50 percent offset from center
+  sx: number;
   sy: number;
-  sr: number; // rotation in degrees
-  // assembled target
+  sr: number;
   w: number;
   h: number;
   bg: string;
@@ -42,8 +34,42 @@ const SHARDS: Shard[] = [
   { id: 6, sx:  -8, sy:  36, sr:  -8, w: 180, h: 70,  bg: "bg-spark-accent/20",     borderClass: "border-spark-accent/30",     zIndex: 2 },
 ];
 
+const SERVICES_LIST = [
+  "Website Development",
+  "Mobile App Development",
+  "ERP Systems",
+  "CRM Solutions",
+  "UI/UX Design",
+  "Graphic Design",
+  "Social Media Marketing",
+  "Branding",
+  "E-commerce Development",
+  "Analytics & Reporting"
+];
+
+const BUDGET_OPTIONS = [
+  "<$10k",
+  "$10k - $30k",
+  "$30k - $50k",
+  "$50k+"
+];
+
 export function CTASection() {
   const ref = React.useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
+  
+  const [formData, setFormData] = React.useState({
+    name: "",
+    email: "",
+    phone: "",
+    selected_service: SERVICES_LIST[0],
+    budget: BUDGET_OPTIONS[1],
+    message: "",
+  });
+  
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [isSubmitted, setIsSubmitted] = React.useState(false);
+
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "center center"],
@@ -55,9 +81,55 @@ export function CTASection() {
     mass: 0.5,
   });
 
-  // headline rise + opacity
   const headlineY = useTransform(p, [0, 1], [80, 0]);
   const headlineO = useTransform(p, [0, 0.5, 1], [0, 0.6, 1]);
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.name.trim() || !formData.email.trim() || !formData.phone.trim() || !formData.message.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill out all required fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await submitInquiry(formData);
+      setIsSubmitting(false);
+      setIsSubmitted(true);
+      toast({
+        title: "Inquiry Sent!",
+        description: "Thank you for reaching out. We will get in touch shortly.",
+      });
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        selected_service: SERVICES_LIST[0],
+        budget: BUDGET_OPTIONS[1],
+        message: "",
+      });
+      // reset success state after 5 seconds
+      setTimeout(() => setIsSubmitted(false), 5000);
+    } catch (error: any) {
+      setIsSubmitting(false);
+      toast({
+        title: "Submission Failed",
+        description: error.message || "There was a problem submitting your inquiry. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <section
@@ -109,24 +181,154 @@ export function CTASection() {
             system and the roadmap — you bring the ambition.
           </p>
 
-          <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-            <MagneticButton href="mailto:hello@sparktechnology.io" variant="gold" strength={18}>
-              <Mail className="h-4 w-4" />
-              Start a project
-              <ArrowUpRight className="h-4 w-4" />
-            </MagneticButton>
-            <MagneticButton
-              href="#process"
-              variant="ghost"
-              strength={12}
-              className="text-spark-secondary hover:bg-white/5"
-            >
-              <Calendar className="h-4 w-4" />
-              Book a 30-min intro
-            </MagneticButton>
-          </div>
+          {/* Premium Contact Form Grid */}
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2, duration: 0.8 }}
+            className="mx-auto mt-14 max-w-3xl overflow-hidden rounded-3xl border border-spark-accent/20 bg-white/[0.03] p-6 shadow-2xl backdrop-blur-xl sm:p-10"
+          >
+            <form onSubmit={handleFormSubmit} className="space-y-6 text-left">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="name" className="block text-xs font-semibold uppercase tracking-wider text-spark-accent">
+                    Your Name *
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    required
+                    placeholder="e.g. Maya Hernandez"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    className="mt-2 w-full rounded-2xl border border-spark-primary/20 bg-white/5 px-4 py-3 text-sm text-spark-secondary placeholder:text-spark-secondary/40 focus:border-spark-accent focus:outline-none focus:ring-1 focus:ring-spark-accent/30 transition-all"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="email" className="block text-xs font-semibold uppercase tracking-wider text-spark-accent">
+                    Email Address *
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    required
+                    placeholder="e.g. maya@northpeak.com"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="mt-2 w-full rounded-2xl border border-spark-primary/20 bg-white/5 px-4 py-3 text-sm text-spark-secondary placeholder:text-spark-secondary/40 focus:border-spark-accent focus:outline-none focus:ring-1 focus:ring-spark-accent/30 transition-all"
+                  />
+                </div>
+              </div>
 
-          <div className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-[11px] uppercase tracking-[0.18em] text-spark-secondary/40">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="phone" className="block text-xs font-semibold uppercase tracking-wider text-spark-accent">
+                    Phone Number *
+                  </label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    required
+                    placeholder="e.g. +1 555-0199"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    className="mt-2 w-full rounded-2xl border border-spark-primary/20 bg-white/5 px-4 py-3 text-sm text-spark-secondary placeholder:text-spark-secondary/40 focus:border-spark-accent focus:outline-none focus:ring-1 focus:ring-spark-accent/30 transition-all"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="selected_service" className="block text-xs font-semibold uppercase tracking-wider text-spark-accent">
+                    Project Service
+                  </label>
+                  <div className="relative mt-2">
+                    <select
+                      id="selected_service"
+                      name="selected_service"
+                      value={formData.selected_service}
+                      onChange={handleInputChange}
+                      className="w-full appearance-none rounded-2xl border border-spark-primary/20 bg-spark-ink px-4 py-3 text-sm text-spark-secondary focus:border-spark-accent focus:outline-none focus:ring-1 focus:ring-spark-accent/30 transition-all"
+                    >
+                      {SERVICES_LIST.map((service) => (
+                        <option key={service} value={service} className="bg-spark-ink text-spark-secondary">
+                          {service}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-spark-accent">
+                      <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-spark-accent mb-2">
+                  Project Budget
+                </label>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  {BUDGET_OPTIONS.map((option) => (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => setFormData((prev) => ({ ...prev, budget: option }))}
+                      className={`rounded-xl border py-2.5 text-xs font-medium transition-all ${
+                        formData.budget === option
+                          ? "border-spark-accent bg-spark-accent/15 text-spark-accent shadow-md shadow-spark-accent/5"
+                          : "border-spark-primary/10 bg-white/5 text-spark-secondary/70 hover:bg-white/10"
+                      }`}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="message" className="block text-xs font-semibold uppercase tracking-wider text-spark-accent">
+                  Tell us about your project *
+                </label>
+                <textarea
+                  id="message"
+                  name="message"
+                  required
+                  rows={4}
+                  placeholder="Describe your vision, roadmap, timeline and technical constraints..."
+                  value={formData.message}
+                  onChange={handleInputChange}
+                  className="mt-2 w-full rounded-2xl border border-spark-primary/20 bg-white/5 px-4 py-3 text-sm text-spark-secondary placeholder:text-spark-secondary/40 focus:border-spark-accent focus:outline-none focus:ring-1 focus:ring-spark-accent/30 transition-all resize-none"
+                />
+              </div>
+
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  disabled={isSubmitting || isSubmitted}
+                  className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-2xl bg-gradient-to-r from-spark-accent to-spark-accent-soft px-8 py-4 text-sm font-semibold text-spark-ink shadow-gold transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50"
+                >
+                  {isSubmitting ? (
+                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-spark-ink border-t-transparent" />
+                  ) : isSubmitted ? (
+                    <>
+                      <Sparkles className="h-4 w-4" />
+                      Inquiry Submitted Successfully!
+                    </>
+                  ) : (
+                    <>
+                      <span>Submit Project Inquiry</span>
+                      <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </motion.div>
+
+          <div className="mt-16 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-[11px] uppercase tracking-[0.18em] text-spark-secondary/40">
             <span>hello@sparktechnology.io</span>
             <span className="hidden h-3 w-px bg-spark-secondary/20 sm:block" />
             <span>Remote · Worldwide</span>
@@ -146,7 +348,6 @@ function ShardPiece({
   shard: Shard;
   progress: MotionValue<number>;
 }) {
-  // assemble from scattered to centered
   const x = useTransform(progress, [0, 1], [`${shard.sx}%`, "0%"]);
   const y = useTransform(progress, [0, 1], [`${shard.sy}%`, "0%"]);
   const rotate = useTransform(progress, [0, 1], [shard.sr, 0]);

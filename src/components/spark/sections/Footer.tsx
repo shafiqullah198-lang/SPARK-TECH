@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Github, Twitter, Linkedin, Dribbble, ArrowUpRight } from "lucide-react";
 
-const FOOTER_NAV: { title: string; links: { label: string; href: string }[] }[] = [
+const FOOTER_NAV = [
   {
     title: "Services",
     links: [
@@ -45,14 +45,50 @@ const FOOTER_NAV: { title: string; links: { label: string; href: string }[] }[] 
   },
 ];
 
-const SOCIALS = [
-  { icon: Twitter, label: "Twitter", href: "#" },
-  { icon: Linkedin, label: "LinkedIn", href: "#" },
-  { icon: Dribbble, label: "Dribbble", href: "#" },
-  { icon: Github, label: "GitHub", href: "#" },
-];
-
 export function Footer() {
+  const [settings, setSettings] = React.useState<any>(null);
+
+  React.useEffect(() => {
+    import("@/lib/api").then((mod) => {
+      mod.getSiteSettings().then((data) => {
+        setSettings(data);
+      });
+    });
+  }, []);
+
+  const companyName = settings?.company_name || "Spark Technology";
+  const logo = settings?.logo || "/assets/spark-logo.jpg";
+  const email = settings?.email || "hello@sparktechnology.io";
+  const address = settings?.address || "Remote · Worldwide";
+  const whatsapp = settings?.whatsapp_number || "";
+
+  const words = companyName.split(" ");
+  const firstWord = words[0] || "Spark";
+  const restWords = words.slice(1).join(" ") || "Technology";
+
+  const SOCIALS = [
+    { icon: Twitter, label: "Twitter", href: settings?.social_twitter || "#" },
+    { icon: Linkedin, label: "LinkedIn", href: settings?.social_linkedin || "#" },
+    { icon: Dribbble, label: "Dribbble", href: settings?.social_dribbble || "#" },
+    { icon: Github, label: "GitHub", href: settings?.social_github || "#" },
+  ];
+
+  // Adjust FOOTER_NAV dynamic contact label
+  const updatedNav = FOOTER_NAV.map((col) => {
+    if (col.title === "Contact") {
+      return {
+        ...col,
+        links: col.links.map((link) => {
+          if (link.href.startsWith("mailto:")) {
+            return { label: email, href: `mailto:${email}` };
+          }
+          return link;
+        }),
+      };
+    }
+    return col;
+  });
+
   return (
     <footer className="relative overflow-hidden border-t border-spark-primary/15 bg-spark-secondary pt-20">
       <div className="pointer-events-none absolute inset-0 bg-dots opacity-30" />
@@ -65,17 +101,17 @@ export function Footer() {
             <a href="#top" className="inline-flex items-center gap-2.5">
               <span className="relative grid h-11 w-11 place-items-center overflow-hidden rounded-xl bg-spark-ink shadow-spark">
                 <img
-                  src="/assets/spark-logo.jpg"
-                  alt="Spark Technology logo"
+                  src={logo}
+                  alt={`${companyName} logo`}
                   className="h-full w-full object-cover"
                 />
               </span>
               <div className="flex flex-col leading-none">
                 <span className="font-serif text-base tracking-wide text-spark-ink">
-                  Spark
+                  {firstWord}
                 </span>
                 <span className="text-[10px] font-medium uppercase tracking-[0.24em] text-spark-muted">
-                  Technology
+                  {restWords}
                 </span>
               </div>
             </a>
@@ -86,6 +122,12 @@ export function Footer() {
               analytics under one roof.
             </p>
 
+            {whatsapp && (
+              <p className="mt-3 text-xs text-spark-muted">
+                WhatsApp: <a href={`https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}`} className="text-spark-primary hover:underline">{whatsapp}</a>
+              </p>
+            )}
+
             <div className="mt-6 flex gap-2">
               {SOCIALS.map((s) => {
                 const Icon = s.icon;
@@ -93,6 +135,8 @@ export function Footer() {
                   <a
                     key={s.label}
                     href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     aria-label={s.label}
                     className="grid h-9 w-9 place-items-center rounded-full border border-spark-primary/15 bg-white/50 text-spark-primary backdrop-blur-md transition-all hover:-translate-y-0.5 hover:border-spark-primary/35 hover:bg-spark-primary hover:text-spark-secondary"
                   >
@@ -105,7 +149,7 @@ export function Footer() {
 
           {/* nav grid */}
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-4 lg:col-span-8">
-            {FOOTER_NAV.map((col) => (
+            {updatedNav.map((col) => (
               <div key={col.title}>
                 <h4 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-spark-ink/70">
                   {col.title}
@@ -160,7 +204,7 @@ export function Footer() {
         {/* bottom row */}
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-spark-primary/10 py-6 sm:flex-row">
           <p className="text-xs text-spark-muted">
-            © {new Date().getFullYear()} Spark Technology. All rights reserved.
+            © {new Date().getFullYear()} {companyName}. All rights reserved.
           </p>
           <div className="flex items-center gap-5 text-xs text-spark-muted">
             <a href="#" className="hover:text-spark-primary">Privacy</a>
@@ -179,13 +223,13 @@ export function Footer() {
             <div className="flex items-center gap-2.5">
               <span className="relative grid h-8 w-8 place-items-center overflow-hidden rounded-lg bg-spark-ink">
                 <img
-                  src="/assets/spark-logo.jpg"
-                  alt="Spark Technology logo"
+                  src={logo}
+                  alt={`${companyName} logo`}
                   className="h-full w-full object-cover"
                 />
               </span>
               <span className="font-serif text-sm text-spark-ink">
-                Spark Technology
+                {companyName}
               </span>
             </div>
             <p className="max-w-md text-center text-[11px] leading-relaxed text-spark-muted sm:text-right">
@@ -194,7 +238,7 @@ export function Footer() {
             </p>
             <div className="flex items-center gap-2 text-[11px] text-spark-muted">
               <span className="h-1 w-1 rounded-full bg-spark-accent" />
-              <span>Made with passion</span>
+              <span>{address}</span>
             </div>
           </div>
         </div>

@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { SectionHeading } from "../ui/SectionHeading";
 import { StaggerGroup, StaggerItem } from "../ui/Stagger";
+import { getPortfolio } from "@/lib/api";
 
 type Project = {
   client: string;
@@ -14,80 +15,33 @@ type Project = {
   metric: string;
   metricLabel: string;
   image: string;
-  palette: string; // tailwind gradient classes
+  palette: string;
   size: "lg" | "md" | "sm";
 };
 
-const PROJECTS: Project[] = [
-  {
-    client: "NorthPeak",
-    category: "E-commerce Platform",
-    title: "Headless commerce rebuild that 3x'd conversion",
-    result: "Migrated a legacy Shopify storefront to a custom headless build with edge personalization.",
-    metric: "3.1×",
-    metricLabel: "Conversion",
-    image: "/assets/portfolio/northpeak.png",
-    palette: "from-spark-primary to-spark-primary-deep",
-    size: "lg",
-  },
-  {
-    client: "Lumen Labs",
-    category: "SaaS Dashboard",
-    title: "AI analytics suite for fintech ops",
-    result: "Designed and engineered a real-time risk dashboard processing 4B events/day.",
-    metric: "4B",
-    metricLabel: "Events/day",
-    image: "/assets/portfolio/lumen.png",
-    palette: "from-spark-accent to-spark-primary",
-    size: "md",
-  },
-  {
-    client: "Atlas Retail",
-    category: "ERP System",
-    title: "Unified ERP for a 200-store retail group",
-    result: "Replaced 9 disconnected tools with a single custom ERP — inventory, finance, HR.",
-    metric: "9→1",
-    metricLabel: "Tools unified",
-    image: "/assets/portfolio/atlas.png",
-    palette: "from-spark-primary-deep to-spark-primary-soft",
-    size: "md",
-  },
-  {
-    client: "Verdant",
-    category: "Mobile App",
-    title: "Sustainability app with 250K MAU",
-    result: "Cross-platform app with offline-first sync and gamified carbon tracking.",
-    metric: "250K",
-    metricLabel: "Monthly users",
-    image: "/assets/portfolio/verdant.png",
-    palette: "from-spark-accent to-spark-accent-soft",
-    size: "sm",
-  },
-  {
-    client: "Quantica",
-    category: "Branding",
-    title: "Identity system for a quantum startup",
-    result: "End-to-end rebrand — naming, logo, voice, guidelines and investor deck.",
-    metric: "$28M",
-    metricLabel: "Series A raised",
-    image: "/assets/portfolio/quantica.png",
-    palette: "from-spark-primary-soft to-spark-accent",
-    size: "sm",
-  },
-  {
-    client: "Helix Bank",
-    category: "CRM + Analytics",
-    title: "CRM rebuild that cut churn by 41%",
-    result: "Customer platform with predictive churn scoring and automated retention plays.",
-    metric: "−41%",
-    metricLabel: "Churn",
-    image: "/assets/portfolio/helix.png",
-    palette: "from-spark-primary to-spark-accent",
-    size: "md",
-  },
-];
-
 export function PortfolioSection() {
+  const [projects, setProjects] = React.useState<Project[]>([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    getPortfolio().then((data: any) => {
+      // Map API fields if different
+      const formatted = data.map((item: any) => ({
+        client: item.client,
+        category: item.category,
+        title: item.title || item.project_title,
+        result: item.result || item.description,
+        metric: item.metric,
+        metricLabel: item.metricLabel || item.metric_label,
+        image: item.image || item.image_path,
+        palette: item.palette || "from-spark-primary to-spark-primary-deep",
+        size: item.size || "md",
+      }));
+      setProjects(formatted);
+      setLoading(false);
+    });
+  }, []);
+
   return (
     <section
       id="portfolio"
@@ -125,23 +79,34 @@ export function PortfolioSection() {
           </motion.a>
         </div>
 
-        <StaggerGroup
-          className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
-          stagger={0.08}
-        >
-          {PROJECTS.map((p, i) => (
-            <StaggerItem
-              key={p.client}
-              className={
-                p.size === "lg"
-                  ? "sm:col-span-2 lg:col-span-2"
-                  : ""
-              }
-            >
-              <ProjectCard project={p} index={i} />
-            </StaggerItem>
-          ))}
-        </StaggerGroup>
+        {loading ? (
+          <div className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div
+                key={i}
+                className="h-80 w-full animate-pulse rounded-3xl border border-spark-primary/10 bg-white/30 backdrop-blur-md"
+              />
+            ))}
+          </div>
+        ) : (
+          <StaggerGroup
+            className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+            stagger={0.08}
+          >
+            {projects.map((p, i) => (
+              <StaggerItem
+                key={p.client}
+                className={
+                  p.size === "lg"
+                    ? "sm:col-span-2 lg:col-span-2"
+                    : ""
+                }
+              >
+                <ProjectCard project={p} index={i} />
+              </StaggerItem>
+            ))}
+          </StaggerGroup>
+        )}
       </div>
     </section>
   );
@@ -179,11 +144,17 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
     >
       {/* visual — real project screenshot */}
       <div className="relative aspect-[16/10] overflow-hidden">
-        <img
-          src={project.image}
-          alt={`${project.client} — ${project.category}`}
-          className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
-        />
+        {project.image ? (
+          <img
+            src={project.image}
+            alt={`${project.client} — ${project.category}`}
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-spark-ink flex items-center justify-center">
+            <span className="text-xl font-bold text-spark-accent">{project.client}</span>
+          </div>
+        )}
         {/* brand tint overlay */}
         <div className={`absolute inset-0 bg-gradient-to-br ${project.palette} opacity-40 mix-blend-multiply`} />
         <div className="absolute inset-0 bg-gradient-to-t from-spark-ink/75 via-spark-ink/15 to-transparent" />
@@ -221,12 +192,11 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           <span className="text-[10px] uppercase tracking-[0.18em] text-spark-muted">
             Case study
           </span>
-          <motion.span
-            whileHover={{ x: 3, y: -3 }}
-            className="grid h-7 w-7 place-items-center rounded-full border border-spark-primary/25 bg-spark-primary/10 text-spark-primary"
-          >
-            <ArrowUpRight className="h-3 w-3" />
-          </motion.span>
+          <a href="#contact" className="grid h-7 w-7 place-items-center rounded-full border border-spark-primary/25 bg-spark-primary/10 text-spark-primary">
+            <motion.span whileHover={{ x: 3, y: -3 }} className="inline-block">
+              <ArrowUpRight className="h-3 w-3" />
+            </motion.span>
+          </a>
         </div>
       </div>
     </motion.div>

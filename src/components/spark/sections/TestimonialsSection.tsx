@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Quote, Star } from "lucide-react";
 import { SectionHeading } from "../ui/SectionHeading";
 import { StaggerGroup, StaggerItem } from "../ui/Stagger";
+import { getTestimonials } from "@/lib/api";
 
 type Testimonial = {
   quote: string;
@@ -16,70 +17,27 @@ type Testimonial = {
   accent?: "primary" | "gold";
 };
 
-const TESTIMONIALS: Testimonial[] = [
-  {
-    quote:
-      "Spark rebuilt our storefront in nine weeks. Conversion 3x'd in the first quarter post-launch — the ROI was unambiguous. They felt like our team, not a vendor.",
-    name: "Maya Hernandez",
-    role: "VP Growth",
-    company: "NorthPeak",
-    initials: "MH",
-    rating: 5,
-    accent: "primary",
-  },
-  {
-    quote:
-      "The ERP Spark built replaced nine tools. Our ops team finally has one source of truth — and our finance close dropped from 14 days to 3.",
-    name: "Daniel Park",
-    role: "COO",
-    company: "Atlas Retail",
-    initials: "DP",
-    rating: 5,
-    accent: "gold",
-  },
-  {
-    quote:
-      "Best product studio we've worked with. Senior pod, no handoffs, weekly demos. They shipped our v1 in six weeks and we raised Series A off the prototype.",
-    name: "Aisha Karim",
-    role: "Founder & CEO",
-    company: "Quantica",
-    initials: "AK",
-    rating: 5,
-    accent: "primary",
-  },
-  {
-    quote:
-      "Their design system work alone paid for the engagement. Every screen since has shipped 40% faster — and looks award-winning.",
-    name: "Tom Whitfield",
-    role: "Head of Design",
-    company: "Lumen Labs",
-    initials: "TW",
-    rating: 5,
-    accent: "gold",
-  },
-  {
-    quote:
-      "We retained Spark after launch for roadmap. Two years in, they've shipped four major releases and our churn is down 41%.",
-    name: "Sofia Rinaldi",
-    role: "CPO",
-    company: "Helix Bank",
-    initials: "SR",
-    rating: 5,
-    accent: "primary",
-  },
-  {
-    quote:
-      "From brand strategy to analytics dashboard, Spark owned the whole stack. The work is genuinely beautiful — and it performs.",
-    name: "Marcus Chen",
-    role: "CMO",
-    company: "Verdant",
-    initials: "MC",
-    rating: 5,
-    accent: "gold",
-  },
-];
-
 export function TestimonialsSection() {
+  const [testimonials, setTestimonials] = React.useState<Testimonial[]>([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    getTestimonials().then((data: any) => {
+      // Map API fields if different
+      const formatted = data.map((item: any) => ({
+        quote: item.quote || item.message,
+        name: item.name || item.client_name,
+        role: item.role,
+        company: item.company,
+        initials: item.initials || item.image_path,
+        rating: item.rating,
+        accent: item.accent || "primary",
+      }));
+      setTestimonials(formatted);
+      setLoading(false);
+    });
+  }, []);
+
   return (
     <section
       id="testimonials"
@@ -102,13 +60,24 @@ export function TestimonialsSection() {
           description="Founders, CPOs and growth leads on what it's like to build with Spark — and the outcomes we've delivered together."
         />
 
-        <StaggerGroup className="mt-14 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3" stagger={0.07}>
-          {TESTIMONIALS.map((t) => (
-            <StaggerItem key={t.name}>
-              <TestimonialCard t={t} />
-            </StaggerItem>
-          ))}
-        </StaggerGroup>
+        {loading ? (
+          <div className="mt-14 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div
+                key={i}
+                className="h-64 w-full animate-pulse rounded-3xl border border-spark-primary/10 bg-white/30 backdrop-blur-md"
+              />
+            ))}
+          </div>
+        ) : (
+          <StaggerGroup className="mt-14 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3" stagger={0.07}>
+            {testimonials.map((t, idx) => (
+              <StaggerItem key={`${t.name}-${idx}`}>
+                <TestimonialCard t={t} />
+              </StaggerItem>
+            ))}
+          </StaggerGroup>
+        )}
       </div>
     </section>
   );
@@ -151,7 +120,7 @@ function TestimonialCard({ t }: { t: Testimonial }) {
               : "bg-spark-primary/10 text-spark-primary")
           }
         >
-          {t.initials}
+          {t.initials || "ST"}
         </div>
         <div>
           <div className="text-sm font-medium text-spark-ink">{t.name}</div>

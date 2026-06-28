@@ -16,6 +16,8 @@ const NAV = [
 export function Navbar() {
   const [open, setOpen] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
+  const [logo, setLogo] = React.useState("/assets/spark-logo.jpg");
+  const [companyName, setCompanyName] = React.useState("Spark Technology");
   const { scrollY } = useScroll();
 
   React.useEffect(() => {
@@ -23,11 +25,24 @@ export function Navbar() {
     return () => unsub();
   }, [scrollY]);
 
+  React.useEffect(() => {
+    import("@/lib/api").then((mod) => {
+      mod.getSiteSettings().then((settings) => {
+        if (settings.logo) setLogo(settings.logo);
+        if (settings.company_name) setCompanyName(settings.company_name);
+      });
+    });
+  }, []);
+
   const pad = useTransform(
     scrollY,
     [0, 80],
     ["1.4rem", "0.85rem"]
   );
+
+  const words = companyName.split(" ");
+  const firstWord = words[0] || "Spark";
+  const restWords = words.slice(1).join(" ") || "Technology";
 
   return (
     <motion.header
@@ -55,18 +70,18 @@ export function Navbar() {
           <a href="#top" className="group flex items-center gap-2.5">
             <span className="relative grid h-10 w-10 place-items-center overflow-hidden rounded-xl bg-spark-ink shadow-spark">
               <img
-                src="/assets/spark-logo.jpg"
-                alt="Spark Technology logo"
+                src={logo}
+                alt={`${companyName} logo`}
                 className="h-full w-full object-cover"
               />
               <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-spark-accent animate-pulse" />
             </span>
             <div className="flex flex-col leading-none">
               <span className="font-serif text-[15px] tracking-wide text-spark-ink">
-                Spark
+                {firstWord}
               </span>
               <span className="text-[10px] font-medium uppercase tracking-[0.24em] text-spark-muted">
-                Technology
+                {restWords}
               </span>
             </div>
           </a>

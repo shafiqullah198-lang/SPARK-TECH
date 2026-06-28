@@ -52,3 +52,17 @@ prompt
 server.log
 # Skills directory
 /skills/
+
+# Python virtual environment
+venv/
+.venv/
+ENV/
+
+# Django specific ignores
+backend/.env
+backend/db.sqlite3
+backend/__pycache__/
+backend/media/
+backend/staticfiles/
+*.pyc
+__pycache__/
