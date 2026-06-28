@@ -115,6 +115,8 @@ export function PortfolioSection() {
 function ProjectCard({ project, index }: { project: Project; index: number }) {
   const cardRef = React.useRef<HTMLDivElement>(null);
   const [tilt, setTilt] = React.useState({ rx: 0, ry: 0 });
+  const [imgLoaded, setImgLoaded] = React.useState(false);
+  const [imgSrc, setImgSrc] = React.useState(project.image || "/assets/portfolio/northpeak.png");
 
   const handleMove = (e: React.MouseEvent) => {
     const el = cardRef.current;
@@ -143,20 +145,30 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
       className="group relative h-full overflow-hidden rounded-3xl border border-spark-primary/12 bg-white/55 backdrop-blur-xl shadow-spark"
     >
       {/* visual — real project screenshot */}
-      <div className="relative aspect-[16/10] overflow-hidden">
-        {project.image ? (
-          <img
-            src={project.image}
-            alt={`${project.client} — ${project.category}`}
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
-          />
-        ) : (
-          <div className="absolute inset-0 bg-spark-ink flex items-center justify-center">
-            <span className="text-xl font-bold text-spark-accent">{project.client}</span>
+      <div className="relative aspect-[16/10] overflow-hidden bg-white/10">
+        {/* Skeleton loader */}
+        {!imgLoaded && (
+          <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-spark-primary/10 via-spark-accent/10 to-spark-primary/10 flex items-center justify-center">
+            <span className="text-[10px] uppercase tracking-widest text-spark-muted animate-pulse">Loading...</span>
           </div>
         )}
+
+        <img
+          src={imgSrc}
+          alt={`${project.client} — ${project.category}`}
+          loading="lazy"
+          onLoad={() => setImgLoaded(true)}
+          onError={() => {
+            setImgSrc("/assets/portfolio/northpeak.png");
+            setImgLoaded(true);
+          }}
+          className={`absolute inset-0 h-full w-full object-cover transition-all duration-700 ease-out group-hover:scale-110 ${
+            imgLoaded ? "opacity-100 scale-100" : "opacity-0 scale-95"
+          }`}
+        />
+
         {/* brand tint overlay */}
-        <div className={`absolute inset-0 bg-gradient-to-br ${project.palette} opacity-40 mix-blend-multiply`} />
+        <div className={`absolute inset-0 bg-gradient-to-br ${project.palette} opacity-30 mix-blend-multiply`} />
         <div className="absolute inset-0 bg-gradient-to-t from-spark-ink/75 via-spark-ink/15 to-transparent" />
 
         {/* metric chip — depth on hover */}

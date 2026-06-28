@@ -455,17 +455,11 @@ export function ScrollStorySection() {
 
                 {/* SPARK TECHNOLOGY LOGO inside the circle, slowly rotating with soft breathing */}
                 <div className="relative z-10 flex h-36 w-36 items-center justify-center rounded-full sm:h-44 sm:w-44 animate-[logo-slow-rotate_40s_linear_infinite]">
-                  <svg viewBox="0 0 30 30" className="h-20 w-20 text-spark-accent drop-shadow-[0_0_15px_rgba(212,175,55,0.65)]">
-                    <path
-                      className="fill-spark-ink/80 stroke-spark-accent/40 stroke-[0.5]"
-                      d="M24.51,28.51H5.49c-2.21,0-4-1.79-4-4V5.49c0-2.21,1.79-4,4-4h19.03c2.21,0,4,1.79,4,4v19.03 C28.51,26.72,26.72,28.51,24.51,28.51z"
-                    />
-                    <g className="fill-spark-accent">
-                      <path d="M15.47,7.1l-1.3,1.85c-0.2,0.29-0.54,0.47-0.9,0.47h-7.1V7.09C6.16,7.1,15.47,7.1,15.47,7.1z" />
-                      <polygon points="24.3,7.1 13.14,22.91 5.7,22.91 16.86,7.1" />
-                      <path d="M14.53,22.91l1.31-1.86c0.2-0.29,0.54-0.47,0.9-0.47h7.09v2.33H14.53z" />
-                    </g>
-                  </svg>
+                  <img
+                    src="/logo-symbol.png"
+                    alt="Spark Technology logo symbol"
+                    className="h-20 w-20 object-contain drop-shadow-[0_0_15px_rgba(0,162,255,0.7)]"
+                  />
                 </div>
               </div>
             </div>
